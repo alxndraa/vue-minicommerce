@@ -7,9 +7,11 @@ import routeMock from '../api-mock'
 // axios mock method
 const mock = new MockAdapter(axios)
 
-mock.onGet("/api/products").reply(200, {
-  ...routeMock[0].response.data
-})
+for(let res of routeMock){
+  mock['on'+ res.method](res.url).reply(res.status, {
+    ...res.response.data
+  })
+}
 
 Vue.use(Vuex)
 
@@ -34,10 +36,16 @@ export default new Vuex.Store({
       axios.get("/api/products").then(function (response) {
         commit('setProducts', response.data)
       });
+    },
+    getProduct ({ commit }, data) {
+      axios.get("/api/products/" + data.id).then(function (response) {
+        commit('setProduct', response.data)
+      });
     }
   },
   getters: {
-    products: state => state.products
+    products: state => state.products,
+    product: state => state.product
   }
 
 })
